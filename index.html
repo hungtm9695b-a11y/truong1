@@ -69,7 +69,7 @@
         <b>1) Vị trí đau</b><br>
         <label><input type="checkbox" name="loc" value="sau_xuong_uc"> Sau xương ức / ngực trái</label><br>
         <label><input type="checkbox" name="loc" value="lan_ham"> Lan cổ – hàm</label><br>
-        <label><input typecheckbox name="loc" value="lan_vai"> Lan vai – tay trái</label><br>
+        <label><input type="checkbox" name="loc" value="lan_vai"> Lan vai – tay trái</label><br>
         <label><input type="checkbox" name="loc" value="thuong_vi"> Thượng vị</label><br>
       </div>
 
@@ -109,7 +109,7 @@
       </div>
     </div>
 
-    <!-- RISK -->
+    <!-- YẾU TỐ NGUY CƠ -->
     <div class="card mb-4">
       <div class="section-title">3) Yếu tố nguy cơ</div>
 
@@ -121,7 +121,7 @@
       <label><input type="checkbox" name="risk" value="beo_phi"> Béo phì</label><br>
     </div>
 
-    <!-- ECG -->
+    <!-- ECG UPLOAD -->
     <div class="card mb-4">
       <div class="section-title">4) Upload ECG</div>
       <input type="file" accept="image/*" class="form-control" name="ecg_file">
@@ -146,7 +146,7 @@
   <div id="ecgAI" class="mt-3"></div>
 
 <script>
-const API_URL = "http://localhost:8000/api/analyze";
+const API_URL = "https://truongmain.onrender.com/api/analyze";
 
 function safe(v){ return (!v || v=="") ? "none" : v; }
 
@@ -154,7 +154,6 @@ function calcESC(){
   const loc = document.querySelectorAll("input[name='loc']:checked").length;
   const trigger = document.querySelectorAll("input[name='trigger']:checked").length;
   const relief = document.querySelectorAll("input[name='relief']:checked").length;
-
   let c=0;
   if(loc>0) c++;
   if(trigger>0) c++;
@@ -165,7 +164,6 @@ function calcESC(){
 function calcHEAR(){
   const age = parseInt(document.querySelector("input[name='age']").value || 0);
   const risk = document.querySelectorAll("input[name='risk']:checked").length;
-
   let A = age>=65?2:(age>=45?1:0);
   let R = risk>=3?2:(risk>=1?1:0);
   const total=A+R;
@@ -227,7 +225,7 @@ document.getElementById("aiForm").addEventListener("submit", async(e)=>{
   adviceBox.textContent =
     `Khuyến cáo:\n- ${data.khuyen_cao[0]}\n- ${data.khuyen_cao[1]}`;
 
-  // ECG
+  // ECG kết luận
   document.getElementById("ecgAI").innerHTML =
     `<b>📈 AI đọc ECG:</b><br>${data.ecg.ket_luan_ecg}`;
 });
