@@ -1,105 +1,267 @@
 <!DOCTYPE html>
 <html lang="vi">
 <head>
-  <meta charset="UTF-8">
+  <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>AI Tim Mạch – Bs Hưng</title>
+  <title>AI Tim Mạch - ESC 2023 Assistant</title>
 
-  <!-- CSS -->
-  <link rel="stylesheet" href="static/css/style.css">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
 
-  <!-- Bootstrap Icons (optional, để giao diện đẹp hơn) -->
-  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css" rel="stylesheet">
+  <style>
+    body { background: #eef2f6; padding: 20px; font-family: 'Segoe UI', sans-serif; }
+    .card { border-radius: 16px; padding: 25px; border: none; box-shadow: 0 2px 10px rgba(0,0,0,0.05); margin-bottom: 20px; }
+    .section-title { font-weight: 700; color: #2c3e50; font-size: 18px; margin-bottom: 15px; border-bottom: 2px solid #eee; padding-bottom: 10px; }
+    
+    .symptom-group { background: #f8f9fa; padding: 15px; border-radius: 8px; margin-bottom: 10px; }
+    .symptom-group b { color: #0d6efd; display: block; margin-bottom: 8px; }
+
+    .risk-box, .advice-box, .ecg-box { padding: 20px; border-radius: 12px; margin-top: 15px; background: #fff; box-shadow: 0 2px 8px rgba(0,0,0,0.05); }
+    
+    /* Màu sắc cảnh báo động */
+    .bg-red { background-color: #fff5f5; border-left: 5px solid #dc3545; }
+    .bg-yellow { background-color: #fffbf0; border-left: 5px solid #ffc107; }
+    .bg-green { background-color: #f0fff4; border-left: 5px solid #198754; }
+
+    .btn-analyze { height: 55px; font-size: 18px; font-weight: bold; border-radius: 10px; }
+  </style>
 </head>
 
 <body>
-  <div class="container">
+<div class="container" style="max-width: 900px;">
+  <h2 class="text-center mb-4" style="color: #0056b3;"><i class="fa-solid fa-heart-pulse"></i> AI Hỗ Trợ Chẩn Đoán ESC 2023</h2>
 
-    <h1 class="title mt-3 mb-4">AI Tim Mạch – Bs Hưng</h1>
+  <form id="aiForm">
+    <div class="row">
+      <div class="col-md-6">
+        <div class="card">
+          <div class="section-title">1. Thông tin & Sinh hiệu</div>
+          <div class="row g-2">
+            <div class="col-6">
+                <label>Tuổi</label>
+                <input type="number" class="form-control" name="age" placeholder="VD: 65">
+            </div>
+            <div class="col-6">
+                <label>Giới tính</label>
+                <select class="form-control" name="sex">
+                    <option value="nam">Nam</option>
+                    <option value="nu">Nữ</option>
+                </select>
+            </div>
+            <div class="col-12 mt-2">
+                <label>Huyết áp (SBP/DBP)</label>
+                <div class="input-group">
+                    <input type="number" class="form-control" name="sbp" placeholder="120">
+                    <span class="input-group-text">/</span>
+                    <input type="number" class="form-control" name="dbp" placeholder="80">
+                </div>
+            </div>
+            <div class="col-6 mt-2">
+                <label>Mạch (lần/p)</label>
+                <input type="number" class="form-control" name="hr" placeholder="80">
+            </div>
+            <div class="col-6 mt-2">
+                <label>SpO₂ (%)</label>
+                <input type="number" class="form-control" name="spo2" placeholder="98">
+            </div>
+          </div>
+        </div>
 
-    <!-- STEP 1 -->
-    <div id="step1" class="step card-block">
-      <h2>Bước 1 – Thông tin cơ bản</h2>
+        <div class="card">
+          <div class="section-title">2. Triệu chứng lâm sàng</div>
+          
+          <div class="symptom-group">
+            <b>Vị trí & Lan xuyên</b>
+            <div class="form-check"><input class="form-check-input" type="checkbox" name="loc" value="Sau xương ức"><label>Sau xương ức / ngực trái</label></div>
+            <div class="form-check"><input class="form-check-input" type="checkbox" name="loc" value="Lan lên hàm/cổ"><label>Lan cổ – hàm</label></div>
+            <div class="form-check"><input class="form-check-input" type="checkbox" name="loc" value="Lan vai/tay trái"><label>Lan vai – tay trái</label></div>
+          </div>
 
-      <label>Tuổi</label>
-      <input id="age" class="form-control mb-3" type="number" placeholder="Nhập tuổi">
+          <div class="symptom-group">
+            <b>Tính chất đau</b>
+            <div class="form-check"><input class="form-check-input" type="checkbox" name="quality" value="Đè ép/Bóp nghẹt"><label>Tức nặng / bóp nghẹt</label></div>
+            <div class="form-check"><input class="form-check-input" type="checkbox" name="quality" value="Đau nhói điểm"><label>Đau nhói 1 điểm (Loại trừ)</label></div>
+          </div>
 
-      <label>Giới tính</label>
-      <select id="sex" class="form-control mb-4">
-        <option value="Nam">Nam</option>
-        <option value="Nữ">Nữ</option>
-      </select>
+          <div class="symptom-group">
+            <b>Hoàn cảnh xuất hiện</b>
+            <div class="form-check"><input class="form-check-input" type="checkbox" name="trigger" value="Khi gắng sức"><label>Đau khi gắng sức</label></div>
+            <div class="form-check"><input class="form-check-input" type="checkbox" name="relief" value="Nghỉ ngơi đỡ đau"><label>Giảm khi nghỉ</label></div>
+          </div>
+          
+          <div class="symptom-group">
+             <b>Yếu tố nguy cơ (HEAR Score)</b>
+             <div class="form-check"><input class="form-check-input" type="checkbox" name="risk" value="THA"><label>Tăng huyết áp</label></div>
+             <div class="form-check"><input class="form-check-input" type="checkbox" name="risk" value="DTD"><label>Đái tháo đường</label></div>
+             <div class="form-check"><input class="form-check-input" type="checkbox" name="risk" value="Hút thuốc"><label>Hút thuốc lá</label></div>
+             <div class="form-check"><input class="form-check-input" type="checkbox" name="risk" value="Mỡ máu"><label>Rối loạn Lipid máu</label></div>
+          </div>
+        </div>
+      </div>
 
-      <button class="btn-primary w-100" onclick="nextStep(2)">Tiếp tục</button>
+      <div class="col-md-6">
+        <div class="card">
+          <div class="section-title">3. Hình ảnh Điện tâm đồ (ECG)</div>
+          <input type="file" accept="image/*" class="form-control mb-2" name="ecg_file" id="ecgFile" required>
+          <img id="previewImg" src="#" style="display:none; max-width:100%; border-radius:8px; margin-top:10px;">
+        </div>
+
+        <button type="submit" class="btn btn-primary w-100 btn-analyze shadow">
+            <i class="fa-solid fa-user-doctor"></i> PHÂN TÍCH NGAY
+        </button>
+
+        <div id="loading" class="text-center mt-3" style="display:none;">
+            <div class="spinner-border text-primary" role="status"></div>
+            <p class="mt-2 fw-bold">AI đang hội chẩn (Mất khoảng 10-15s)...</p>
+        </div>
+
+        <div id="resultArea" style="display:none;">
+            <div id="riskBox" class="risk-box"></div>
+            <div id="adviceBox" class="advice-box border-start border-4 border-info bg-light"></div>
+            <div id="ecgResult" class="ecg-box border-start border-4 border-primary bg-light"></div>
+        </div>
+      </div>
     </div>
+  </form>
+</div>
 
-    <!-- STEP 2 -->
-    <div id="step2" class="step card-block hidden">
-      <h2>Bước 2 – Tải ảnh ECG</h2>
+<script>
+// =================================================
+// 1. CẤU HÌNH API (QUAN TRỌNG: Đổi link Render của bạn)
+// =================================================
+const API_URL = "https://truongmain.onrender.com/api/analyze"; 
 
-      <input id="ecg" type="file" accept="image/*" class="form-control mb-3">
+// Xem trước ảnh
+document.getElementById('ecgFile').addEventListener('change', function(e){
+    if(e.target.files[0]){
+        const reader = new FileReader();
+        reader.onload = function(e){
+            document.getElementById('previewImg').src = e.target.result;
+            document.getElementById('previewImg').style.display = 'block';
+        }
+        reader.readAsDataURL(e.target.files[0]);
+    }
+});
 
-      <button class="btn-secondary w-100 mb-2" onclick="nextStep(1)">Quay lại</button>
-      <button class="btn-primary w-100" onclick="uploadECG()">Phân tích ECG</button>
+function getCheckedValues(name) {
+    return Array.from(document.querySelectorAll(`input[name="${name}"]:checked`))
+                .map(cb => cb.value).join(", ");
+}
 
-      <div id="loading_ecg" class="loading mt-2"></div>
-    </div>
+// Hàm tính HEAR Score giả định (để gửi tham khảo cho AI)
+function calcHEAR(){
+  const age = parseInt(document.querySelector("input[name='age']").value || 0);
+  const riskCount = document.querySelectorAll("input[name='risk']:checked").length;
+  
+  let score = 0;
+  if(age >= 45) score += 1;
+  if(age >= 65) score += 1; // Cộng thêm
+  if(riskCount >= 3) score += 2;
+  else if(riskCount >= 1) score += 1;
+  
+  // Mức độ
+  let level = "low";
+  if(score >= 4) level = "high";
+  else if(score >= 2) level = "moderate";
+  
+  return { total: score, level: level };
+}
 
-    <!-- STEP 3 -->
-    <div id="step3" class="step card-block hidden">
-      <h2>Bước 3 – Triệu chứng + HEAR Score</h2>
+document.getElementById("aiForm").addEventListener("submit", async(e) => {
+  e.preventDefault();
+  
+  // UI Handling
+  const btn = document.querySelector('.btn-analyze');
+  const loading = document.getElementById('loading');
+  const resultArea = document.getElementById('resultArea');
+  
+  btn.disabled = true;
+  loading.style.display = 'block';
+  resultArea.style.display = 'none';
 
-      <label>Triệu chứng</label>
-      <textarea id="symptoms" class="form-control mb-3" rows="4" placeholder="Mô tả triệu chứng: đau ngực, thời gian, yếu tố khởi phát..."></textarea>
+  try {
+      const formData = new FormData();
+      
+      // 1. Lấy dữ liệu input cơ bản
+      ['age', 'sex', 'sbp', 'dbp', 'hr', 'spo2'].forEach(field => {
+          const val = document.querySelector(`[name="${field}"]`).value;
+          formData.append(field, val || "none");
+      });
 
-      <h3 class="mt-4">Tính điểm HEAR</h3>
+      // 2. Gộp dữ liệu Checkbox thành chuỗi (Fix lỗi code cũ)
+      formData.append('loc', getCheckedValues('loc') || "none");
+      formData.append('quality', getCheckedValues('quality') || "none");
+      formData.append('trigger', getCheckedValues('trigger') || "none");
+      formData.append('relief', getCheckedValues('relief') || "none");
+      formData.append('assoc', "none"); // Bạn có thể thêm checkbox assoc vào HTML tương tự
+      formData.append('dynamic', "none"); 
+      formData.append('noncardiac', "none");
 
-      <label>Lịch sử (History)</label>
-      <select id="history" class="form-control mb-2">
-        <option value="0">0 – Không điển hình</option>
-        <option value="1">1 – Không rõ</option>
-        <option value="2">2 – Điển hình</option>
-      </select>
+      // 3. Tính toán phụ trợ
+      const hear = calcHEAR();
+      formData.append('hear_score', hear.total);
+      formData.append('hear_level', hear.level);
+      formData.append('esc_criteria', "calculated_by_ai"); // Để AI tự đánh giá dựa trên input
 
-      <label>ECG</label>
-      <select id="hear_ecg" class="form-control mb-2">
-        <option value="0">0 – Bình thường</option>
-        <option value="1">1 – Không đặc hiệu</option>
-        <option value="2">2 – ST thay đổi</option>
-      </select>
+      // 4. File ảnh
+      const fileInput = document.querySelector('input[name="ecg_file"]');
+      if(fileInput.files.length > 0){
+          formData.append('ecg_file', fileInput.files[0]);
+      } else {
+          alert("Vui lòng chọn ảnh ECG!");
+          loading.style.display = 'none';
+          btn.disabled = false;
+          return;
+      }
 
-      <label>Tuổi</label>
-      <select id="hear_age" class="form-control mb-2">
-        <option value="0">0 – &lt;45</option>
-        <option value="1">1 – 45–65</option>
-        <option value="2">2 – &gt;65</option>
-      </select>
+      // Gửi Request
+      const res = await fetch(API_URL, { method: "POST", body: formData });
+      
+      if(!res.ok) throw new Error("Lỗi kết nối Server hoặc API Key");
+      
+      const data = await res.json();
 
-      <label>Yếu tố nguy cơ</label>
-      <select id="hear_risk" class="form-control mb-4">
-        <option value="0">0 – Không</option>
-        <option value="1">1 – 1 yếu tố</option>
-        <option value="2">2 – ≥2 yếu tố</option>
-      </select>
+      // HIỂN THỊ KẾT QUẢ
+      
+      // A. Box Nguy cơ & Chẩn đoán
+      const riskBox = document.getElementById("riskBox");
+      riskBox.className = "risk-box"; // Reset class
+      let riskColor = "bg-green";
+      if(data.muc_nguy_co === "cao") riskColor = "bg-red";
+      if(data.muc_nguy_co === "trung_binh") riskColor = "bg-yellow";
+      riskBox.classList.add(riskColor);
+      
+      riskBox.innerHTML = `
+          <h4 class="mb-2">⚠️ Nguy cơ: ${data.muc_nguy_co.toUpperCase()}</h4>
+          <p><b>Chẩn đoán gợi ý:</b> ${data.chan_doan_goi_y}</p>
+          <p><b>Phân loại triệu chứng:</b> ${data.phan_loai_trieu_chung}</p>
+      `;
 
-      <button class="btn-secondary w-100 mb-2" onclick="nextStep(2)">Quay lại</button>
-      <button class="btn-primary w-100" onclick="analyzeClinical()">Tổng hợp AI</button>
+      // B. Box Khuyến cáo
+      let adviceHtml = "<h5 class='text-info'><i class='fa-solid fa-user-nurse'></i> Khuyến cáo xử trí:</h5><ul>";
+      if(Array.isArray(data.khuyen_cao)) {
+          data.khuyen_cao.forEach(item => adviceHtml += `<li>${item}</li>`);
+      }
+      adviceHtml += "</ul>";
+      document.getElementById("adviceBox").innerHTML = adviceHtml;
 
-      <div id="loading_clinical" class="loading mt-2"></div>
-    </div>
+      // C. Box ECG (Dùng Marked để parse Markdown đẹp)
+      document.getElementById("ecgResult").innerHTML = `
+          <h5 class='text-primary'><i class='fa-solid fa-heart-pulse'></i> Kết quả đọc ECG:</h5>
+          <div>${marked.parse(data.ecg.ket_luan_ecg)}</div>
+      `;
 
-    <!-- STEP 4 -->
-    <div id="step4" class="step card-block hidden">
-      <h2>Kết quả phân tích AI</h2>
+      resultArea.style.display = 'block';
 
-      <pre id="result_box" class="result-box"></pre>
+  } catch (err) {
+      alert("Có lỗi xảy ra: " + err.message);
+  } finally {
+      loading.style.display = 'none';
+      btn.disabled = false;
+  }
+});
+</script>
 
-      <button class="btn-secondary w-100 mt-3" onclick="nextStep(1)">Làm lại từ đầu</button>
-    </div>
-
-  </div>
-
-  <!-- JS logic -->
-  <script src="static/js/app.js"></script>
 </body>
 </html>
